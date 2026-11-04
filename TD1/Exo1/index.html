@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TD1 - Exo1 : Géolocalisation</title>
+</head>
+<body>
+    <h1>TD1 - Exo1 : Géolocalisation</h1>
+
+    <label>
+        <input type="checkbox" id="haute-precision">
+        Haute précision (utilise le GPS)
+    </label>
+    <button id="btn-relancer">Relancer les mesures</button>
+
+    <h2>getCurrentPosition() (une seule mesure)</h2>
+    <pre id="resultat-current">En attente...</pre>
+
+    <h2>watchPosition() (mesures en continu)</h2>
+    <pre id="resultat-watch">En attente...</pre>
+
+    <script src="script.js"></script>
+</body>
+</html>
