@@ -17,7 +17,6 @@ function formater(position) {
     );
 }
 
-// Affiche un message d'erreur compréhensible
 function erreur(err) {
     const messages = {
         1: "Permission refusée (autorise la localisation).",
@@ -36,7 +35,6 @@ function demarrer() {
         return;
     }
 
-    // Options : true = on demande le GPS, false = wifi / 4G suffisent
     const options = {
         enableHighAccuracy: document.getElementById("haute-precision").checked,
         timeout: 20000,
@@ -46,14 +44,12 @@ function demarrer() {
     zoneCurrent.textContent = "Mesure en cours...";
     zoneWatch.textContent = "Mesure en cours...";
 
-    // Méthode 1 : une seule mesure
     navigator.geolocation.getCurrentPosition(
         (pos) => { zoneCurrent.textContent = formater(pos); },
         (err) => { zoneCurrent.textContent = erreur(err); },
         options
     );
 
-    // Méthode 2 : mesures en continu (on arrête l'ancien suivi d'abord)
     if (idSuivi !== null) {
         navigator.geolocation.clearWatch(idSuivi);
     }
