@@ -1,65 +1,30 @@
-let idSuivi = null; // mémorise le "suivi" de watchPosition pour pouvoir l'arrêter
-
-// Transforme les données reçues en texte lisible
+// Transforme une position en texte lisible
 function formater(position) {
     const c = position.coords;
-
-    // Certaines valeurs valent null si le téléphone ne les connaît pas
-    const valeur = (v, unite) => (v === null ? "non disponible" : v.toFixed(2) + " " + unite);
-
-    return (
-        "Latitude  : " + c.latitude.toFixed(6) + " °\n" +
-        "Longitude : " + c.longitude.toFixed(6) + " °\n" +
-        "Altitude  : " + valeur(c.altitude, "m") + "\n" +
-        "Précision : " + valeur(c.accuracy, "m") + "\n" +
-        "Vitesse   : " + (c.speed === null ? "non disponible" : (c.speed * 3.6).toFixed(1) + " km/h") + "\n" +
-        "Date      : " + new Date(position.timestamp).toLocaleString("fr-FR")
-    );
+    return "Latitude : " + c.latitude + "\n" +
+           "Longitude : " + c.longitude + "\n" +
+           "Altitude : " + c.altitude + " m\n" +
+           "Précision : " + c.accuracy + " m\n" +
+           "Vitesse : " + c.speed + " m/s\n" +
+           "Date : " + new Date(position.timestamp).toLocaleString("fr-FR");
 }
 
-function erreur(err) {
-    const messages = {
-        1: "Permission refusée (autorise la localisation).",
-        2: "Position indisponible.",
-        3: "Délai dépassé."
-    };
-    return "Erreur : " + (messages[err.code] || err.message);
-}
+const zoneCurrent = document.getElementById("resultat-current");
+const zoneWatch = document.getElementById("resultat-watch");
 
-function demarrer() {
-    const zoneCurrent = document.getElementById("resultat-current");
-    const zoneWatch = document.getElementById("resultat-watch");
+// Pour tester sans GPS, mets false (wifi / 4G)
+const options = { enableHighAccuracy: true };
 
-    if (!("geolocation" in navigator)) {
-        zoneCurrent.textContent = "La géolocalisation n'est pas supportée.";
-        return;
-    }
+// Méthode 1 : une seule mesure
+navigator.geolocation.getCurrentPosition(
+    (pos) => { zoneCurrent.textContent = formater(pos); },
+    (err) => { zoneCurrent.textContent = "Erreur : " + err.message; },
+    options
+);
 
-    const options = {
-        enableHighAccuracy: document.getElementById("haute-precision").checked,
-        timeout: 20000,
-        maximumAge: 0
-    };
-
-    zoneCurrent.textContent = "Mesure en cours...";
-    zoneWatch.textContent = "Mesure en cours...";
-
-    navigator.geolocation.getCurrentPosition(
-        (pos) => { zoneCurrent.textContent = formater(pos); },
-        (err) => { zoneCurrent.textContent = erreur(err); },
-        options
-    );
-
-    if (idSuivi !== null) {
-        navigator.geolocation.clearWatch(idSuivi);
-    }
-    idSuivi = navigator.geolocation.watchPosition(
-        (pos) => { zoneWatch.textContent = formater(pos); },
-        (err) => { zoneWatch.textContent = erreur(err); },
-        options
-    );
-}
-
-document.getElementById("btn-relancer").addEventListener("click", demarrer);
-document.getElementById("haute-precision").addEventListener("change", demarrer);
-demarrer(); // lance tout au chargement de la page
+// Méthode 2 : mesures en continu
+navigator.geolocation.watchPosition(
+    (pos) => { zoneWatch.textContent = formater(pos); },
+    (err) => { zoneWatch.textContent = "Erreur : " + err.message; },
+    options
+);
